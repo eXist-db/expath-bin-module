@@ -34,8 +34,11 @@ import org.exist.xquery.FunctionSignature;
 import org.exist.xquery.value.FunctionParameterSequenceType;
 import org.exist.xquery.value.FunctionReturnSequenceType;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static org.exist.xquery.modules.expath.bin.FunctionSignatureHelpers.functionDefs;
 
 /**
  * Implementation of
@@ -50,13 +53,26 @@ public class ExpathBinModule extends AbstractInternalModule {
     public static final String PREFIX = "bin";
     public static final String RELEASED_IN_VERSION = "eXist-3.2.1";
 
-    public static final FunctionDef[] functions = {
-        new FunctionDef(ConversionFunctions.FS_HEX, ConversionFunctions.class),
-        new FunctionDef(ConversionFunctions.FS_BIN, ConversionFunctions.class),
-        new FunctionDef(ConversionFunctions.FS_OCTAL, ConversionFunctions.class),
-        new FunctionDef(ConversionFunctions.FS_TO_OCTETS, ConversionFunctions.class),
-        new FunctionDef(ConversionFunctions.FS_FROM_OCTETS, ConversionFunctions.class)
-    };
+    public static final FunctionDef[] functions = functionDefs(
+            functionDefs(ConversionFunctions.class,
+                    ConversionFunctions.FS_HEX,
+                    ConversionFunctions.FS_BIN,
+                    ConversionFunctions.FS_OCTAL,
+                    ConversionFunctions.FS_TO_OCTETS,
+                    ConversionFunctions.FS_FROM_OCTETS),
+
+            functionDefs(BasicFunctions.class,
+                    BasicFunctions.FS_LENGTH,
+                    BasicFunctions.FS_PART[0],
+                    BasicFunctions.FS_PART[1],
+                    BasicFunctions.FS_JOIN,
+                    BasicFunctions.FS_INSERT_BEFORE,
+                    BasicFunctions.FS_PAD_LEFT[0],
+                    BasicFunctions.FS_PAD_LEFT[1],
+                    BasicFunctions.FS_PAD_RIGHT[0],
+                    BasicFunctions.FS_PAD_RIGHT[1],
+                    BasicFunctions.FS_FIND)
+    );
 
     public ExpathBinModule(final Map<String, List<? extends Object>> parameters) {
         super(functions, parameters);
@@ -84,6 +100,12 @@ public class ExpathBinModule extends AbstractInternalModule {
 
     static FunctionSignature functionSignature(final String name, final String description, final FunctionReturnSequenceType returnType, final FunctionParameterSequenceType... paramTypes) {
         return FunctionSignatureHelpers.functionSignature(new QName(name, NAMESPACE_URI), description, returnType, paramTypes);
+    }
+
+    static FunctionSignature[] functionSignatures(final String name, final String description, final FunctionReturnSequenceType returnType, final FunctionParameterSequenceType[][] variableParamTypes) {
+        return Arrays.stream(variableParamTypes)
+                .map(paramTypes -> functionSignature(name, description, returnType, paramTypes))
+                .toArray(FunctionSignature[]::new);
     }
 
     static class ExpathBinModuleErrorCode extends ErrorCodes.ErrorCode {

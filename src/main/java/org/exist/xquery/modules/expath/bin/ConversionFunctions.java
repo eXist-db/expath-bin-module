@@ -31,19 +31,23 @@ import org.exist.xquery.*;
 import org.exist.xquery.value.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
 import static org.exist.xquery.modules.expath.bin.ExpathBinModule.ERROR_NON_NUMERIC_CHARACTER;
+import static org.exist.xquery.modules.expath.bin.ExpathBinModule.ERROR_OCTET_OUT_OF_RANGE;
 import static org.exist.xquery.modules.expath.bin.ExpathBinModule.functionSignature;
 import static org.exist.xquery.modules.expath.bin.FunctionSignatureHelpers.*;
+import static org.exist.xquery.modules.expath.bin.Utils.*;
 
 /**
  * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
  */
 public class ConversionFunctions extends BasicFunction {
 
-    static final String FS_HEX_NAME = "hex";
+    private static final String FS_HEX_NAME = "hex";
     static final FunctionSignature FS_HEX = functionSignature(
             FS_HEX_NAME,
             "Returns the binary form of the set of octets written as a sequence of (ASCII) hex digits ([0-9A-Fa-f]).",
@@ -51,7 +55,7 @@ public class ConversionFunctions extends BasicFunction {
             optParam("in", Type.STRING, "The hex digits")
     );
 
-    static final String FS_BIN_NAME = "bin";
+    private static final String FS_BIN_NAME = "bin";
     static final FunctionSignature FS_BIN = functionSignature(
             FS_BIN_NAME,
             "Returns the binary form of the set of octets written as a sequence of (8-wise) (ASCII) binary digits ([01]).",
@@ -59,7 +63,7 @@ public class ConversionFunctions extends BasicFunction {
             optParam("in", Type.STRING, "The binary digits")
     );
 
-    static final String FS_OCTAL_NAME = "octal";
+    private static final String FS_OCTAL_NAME = "octal";
     static final FunctionSignature FS_OCTAL = functionSignature(
             FS_OCTAL_NAME,
             "Returns the binary form of the set of octets written as a sequence of (ASCII) octal digits ([0-7]).",
@@ -67,7 +71,7 @@ public class ConversionFunctions extends BasicFunction {
             optParam("in", Type.STRING, "The octal digits")
     );
 
-    static final String FS_TO_OCTETS_NAME = "to-octets";
+    private static final String FS_TO_OCTETS_NAME = "to-octets";
     static final FunctionSignature FS_TO_OCTETS = functionSignature(
             FS_TO_OCTETS_NAME,
             "Returns binary data as a sequence of octets.",
@@ -75,7 +79,7 @@ public class ConversionFunctions extends BasicFunction {
             optParam("in", Type.BASE64_BINARY, "The binary data")
     );
 
-    static final String FS_FROM_OCTETS_NAME = "from-octets";
+    private static final String FS_FROM_OCTETS_NAME = "from-octets";
     static final FunctionSignature FS_FROM_OCTETS = functionSignature(
             FS_FROM_OCTETS_NAME,
             "Converts a sequence of octets into binary data.",
@@ -119,15 +123,15 @@ public class ConversionFunctions extends BasicFunction {
                 if(inBase64.isPresent()) {
                     return toOctets(inBase64.get());
                 } else {
-                    throw new XPathException(this, "argument cannot be absent");
+                    throw new XPathException(this, "$in argument cannot be absent");
                 }
 
             case FS_FROM_OCTETS_NAME:
-                final Optional<int[]> inOctets = getIntegerSequenceArg(args, 0);
+                final Optional<BigInteger[]> inOctets = getIntegerSequenceArg(args, 0);
                 if(inOctets.isPresent()) {
                     return fromOctets(inOctets.get());
                 } else {
-                    return newEmptyBinary();
+                    return newEmptyBinary(context);
                 }
 
             default:
@@ -190,50 +194,32 @@ public class ConversionFunctions extends BasicFunction {
         return Optional.empty();
     }
 
-    private Optional<BinaryValue> getBinaryArg(final Sequence[] args, final int idx) throws XPathException {
-        if(args.length > idx) {
-            final Sequence arg = args[idx];
-            if (!arg.isEmpty()) {
-
-                final Item item = arg.itemAt(0);
-                if (item != null) {
-                    return Optional.ofNullable((BinaryValue)item.convertTo(Type.BASE64_BINARY));
-                }
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    private Optional<int[]> getIntegerSequenceArg(final Sequence[] args, final int idx) throws XPathException {
-        if(args.length > idx) {
-            final Sequence arg = args[idx];
-            if (!arg.isEmpty()) {
-
-                final int len = arg.getItemCount();
-                final int[] ints = new int[len];
-
-                for(int i = 0; i < len; i++) {
-                    final IntegerValue intValue = (IntegerValue)arg.itemAt(i).convertTo(Type.INTEGER);
-                    ints[i] = intValue.getInt();
-                }
-
-                return Optional.of(ints);
-            }
-        }
-
-        return Optional.empty();
-    }
-
     private Sequence toOctets(final BinaryValue binValue) throws XPathException {
-        return Sequence.EMPTY_SEQUENCE; //TODO(AR) implement
+        try(final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            binValue.streamBinaryTo(baos);
+
+            final ValueSequence valueSequence = new ValueSequence();
+
+            final byte[] data = baos.toByteArray();
+            for(int i = 0; i < data.length; i++) {
+              valueSequence.add(new IntegerValue(data[i] & 0xFF));
+            }
+
+            return valueSequence;
+        } catch (final IOException e) {
+            throw new XPathException(this, e);
+        }
     }
 
-    private BinaryValue fromOctets(final int[] octets) throws XPathException {
-        return newEmptyBinary(); //TODO(AR) implement
-    }
-
-    private BinaryValue newEmptyBinary() throws XPathException {
-        return BinaryValueFromInputStream.getInstance(context, new Base64BinaryValueType(), new ByteArrayInputStream(new byte[0]));
+    private BinaryValue fromOctets(final BigInteger[] octets) throws XPathException {
+        final byte data[] = new byte[octets.length];
+        for(int i = 0; i < octets.length; i++) {
+            final int octet = octets[i].intValue();
+            if(octet < 0 || octet > 255) {
+                throw new XPathException(this, ERROR_OCTET_OUT_OF_RANGE, "octet at index " + i + " is out of range");
+            }
+            data[i] = (byte)(octet & 0xff);
+        }
+        return newInMemoryBinary(context, data);
     }
 }

@@ -28,9 +28,14 @@ package org.exist.xquery.modules.expath.bin;
 
 import org.exist.dom.QName;
 import org.exist.xquery.Cardinality;
+import org.exist.xquery.Function;
+import org.exist.xquery.FunctionDef;
 import org.exist.xquery.FunctionSignature;
 import org.exist.xquery.value.FunctionParameterSequenceType;
 import org.exist.xquery.value.FunctionReturnSequenceType;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
@@ -68,6 +73,14 @@ public class FunctionSignatureHelpers {
         return new FunctionParameterSequenceType(name, type, cardinality, description);
     }
 
+    public static FunctionParameterSequenceType[][] variableParams(final FunctionParameterSequenceType[]... variableParamTypes) {
+        return variableParamTypes;
+    }
+
+    public static FunctionParameterSequenceType[] arity(final FunctionParameterSequenceType... paramTypes) {
+        return paramTypes;
+    }
+
     public static FunctionReturnSequenceType returns(final int type) {
         return returns(type, Cardinality.EXACTLY_ONE);
     }
@@ -90,5 +103,23 @@ public class FunctionSignatureHelpers {
 
     public static FunctionReturnSequenceType returns(final int type, final int cardinality, final String description) {
         return new FunctionReturnSequenceType(type, cardinality, description);
+    }
+
+    public static FunctionDef functionDef(final FunctionSignature functionSignature, Class<? extends Function> clazz) {
+        return new FunctionDef(functionSignature, clazz);
+    }
+
+    public static FunctionDef[] functionDefs(final Class<? extends Function> clazz, final FunctionSignature... functionSignatures) {
+        return Arrays.stream(functionSignatures)
+                .map(fs -> functionDef(fs, clazz))
+                .toArray(FunctionDef[]::new);
+    }
+
+    public static FunctionDef[] functionDefs(final FunctionDef[]... functionDefss) {
+        return Arrays.stream(functionDefss)
+                .map(Arrays::stream)
+                .reduce(Stream::concat)
+                .map(s -> s.toArray(FunctionDef[]::new))
+                .orElse(new FunctionDef[0]);
     }
 }
