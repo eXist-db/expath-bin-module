@@ -90,19 +90,26 @@ public class RegionFilterInputStream extends FilterInputStream {
     }
 
     @Override
-    public int read(final byte[] b, final int off, final int len) throws IOException {
+    public int read(final byte[] b, final int off, int len) throws IOException {
         if(curOffset == 0) {
             seekRegionStart();
         }
 
-        if(regionLen != END_OF_STREAM && curOffset + len > regionOffset + regionLen) {
-            throw new IndexOutOfBoundsException("Attempted to read past end of region. regionEnd=" + (regionOffset + regionLen) + ", readFrom=" + curOffset + ", readTo=" + curOffset + len);
+        // restrict to within the region
+        if(regionLen != END_OF_STREAM) {
+            if(curOffset + len > regionOffset + regionLen) {
+                len = (regionOffset + regionLen) - curOffset;
+                if(len == 0) {
+                    return END_OF_STREAM;
+                }
+            }
         }
 
         final int read = in.read(b, off, len);
         if(read > END_OF_STREAM) {
             curOffset += read;
         }
+
         return read;
     }
 

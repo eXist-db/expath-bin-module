@@ -277,12 +277,20 @@ public class BasicFunctions extends BasicFunction {
     }
 
     private BinaryValue insertBefore(final BinaryValue data, final BigInteger offset, final BinaryValue extra) throws XPathException {
+        final InputStream[] streams;
+        if(offset.intValue() == 0) {
+            streams = new InputStream[2];
+            streams[0] = extra.getInputStream();
+            streams[1] = new RegionFilterInputStream(data.getInputStream(), offset.intValue(), RegionFilterInputStream.END_OF_STREAM);
+        } else {
+            streams = new InputStream[3];
+            streams[0] = new RegionFilterInputStream(data.getInputStream(), 0, offset.intValue());
+            streams[1] = extra.getInputStream();
+            streams[2] = new RegionFilterInputStream(data.getInputStream(), offset.intValue(), RegionFilterInputStream.END_OF_STREAM);
+        }
+
         // we don't need to close the streams, they will be closed by BinaryValueFromInputStream when it goes out of context
-        return BinaryValueFromInputStream.getInstance(context, new Base64BinaryValueType(), new JoinFilterInputStream(new InputStream[] {
-            new RegionFilterInputStream(data.getInputStream(), 0, offset.intValue() - 1),
-            extra.getInputStream(),
-            new RegionFilterInputStream(data.getInputStream(), offset.intValue(), RegionFilterInputStream.END_OF_STREAM)
-        }));
+        return BinaryValueFromInputStream.getInstance(context, new Base64BinaryValueType(), new JoinFilterInputStream(streams));
     }
 
     private BinaryValue padLeft(final BinaryValue data, final BigInteger size, final int octet) throws XPathException {

@@ -40,7 +40,7 @@
 
     <properties>
         <bin.module.namespace>http://expath.org/ns/binary</bin.module.namespace>
-        <exist.version>3.0</exist.version>
+        <exist.version>3.1.0</exist.version>
         <commons.lang.version>3.5</commons.lang.version>
 
         <java.version>1.8</java.version>
@@ -75,6 +75,20 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.exist-db</groupId>
+            <artifactId>exist-testkit</artifactId>
+            <version>20170525</version>  <!-- TODO switch to release version -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     
     <build>

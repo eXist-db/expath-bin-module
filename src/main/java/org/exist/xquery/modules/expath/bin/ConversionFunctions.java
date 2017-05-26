@@ -148,7 +148,11 @@ public class ConversionFunctions extends BasicFunction {
     }
 
     private BinaryValue bin(final String binaryDigits) throws XPathException {
-        final int len = (int)Math.ceil(binaryDigits.length() / 8);
+        int len = (int)Math.ceil(binaryDigits.length() / 8);
+        if(binaryDigits.length() > 0 && len == 0) {
+            len = 1;
+        }
+
         final byte data[] = new byte[len];
         for(int i = 0; i < len; i++) {
             final int start = i * 8;
@@ -159,12 +163,14 @@ public class ConversionFunctions extends BasicFunction {
             }
 
             try {
-                final byte b = Byte.parseByte(bins, 2);
+                final byte b = (byte)Integer.parseUnsignedInt(bins, 2);
                 data[i] = b;
             } catch (final NumberFormatException e) {
                 throw new XPathException(this, ERROR_NON_NUMERIC_CHARACTER, e);
             }
         }
+
+//        final byte data[] = new BigInteger(binaryDigits, 2).toByteArray();
 
         return BinaryValueFromInputStream.getInstance(context, new Base64BinaryValueType(), new ByteArrayInputStream(data));
 
