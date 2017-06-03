@@ -39,14 +39,10 @@ import java.io.InputStream;
 public class RegionFilterInputStream extends FilterInputStream {
 
     public static final int END_OF_STREAM = -1;
-    private static final int DEFAULT_TEMP_BUF_SIZE = 16 * 1024;  // 16KB
 
     // the region within `in` that is accessible to us
     private final int regionOffset;
     private final int regionLen;
-
-    private final int tempBufSize;
-    private byte temp[] = null;  // lazy initialized
 
     private int curOffset = 0;
 
@@ -56,20 +52,9 @@ public class RegionFilterInputStream extends FilterInputStream {
      * @param regionLen The length of the region (starting at regionOffset) within the input stream, or -1 to extend the region to the end of the stream
      */
     public RegionFilterInputStream(final InputStream in, final int regionOffset, final int regionLen) {
-        this(in, regionOffset, regionLen, DEFAULT_TEMP_BUF_SIZE);
-    }
-
-    /**
-     * @param in The input stream to provide a region of
-     * @param regionOffset The offset for the start of the region
-     * @param regionLen The length of the region (starting at regionOffset) within the input stream, or -1 to extend the region to the end of the stream
-     * @param tempBufSize The size of any temporary buffer used (in bytes)
-     */
-    public RegionFilterInputStream(final InputStream in, final int regionOffset, final int regionLen, final int tempBufSize) {
         super(in);
         this.regionOffset = regionOffset;
         this.regionLen = regionLen;
-        this.tempBufSize = tempBufSize;
     }
 
     @Override
@@ -141,31 +126,25 @@ public class RegionFilterInputStream extends FilterInputStream {
     }
 
     private void seekRegionStart() throws IOException {
-        curOffset = (int)in.skip(regionOffset);
-        if(curOffset < regionOffset) {
-            // can't skip as far as we would like
-            // attempt to read our way there
-            final byte buf[] = getTempBuf();
-            while(true) {
-                final int outstanding = regionOffset - curOffset;
-                final int read = in.read(buf, 0, Math.min(outstanding, buf.length));
-                if(read > -1) {
-                    curOffset += read;
-                    if(curOffset == regionOffset) {
-                        break; // we are now in position
-                    }
-                } else {
-                    //EOS
-                    throw new ArrayIndexOutOfBoundsException("Reached end of stream whilst trying to seek to region start. regionOffset=" + regionOffset + ", curOffset=" + curOffset);
-                }
-            }
+        if(curOffset != 0) {
+            return;
         }
-    }
 
-    private byte[] getTempBuf() {
-        if(temp == null) {
-            temp = new byte[tempBufSize];
+        int toSkip = regionOffset;
+
+        while(toSkip > 0) {
+            final int skipped = (int) in.skip(regionOffset);
+
+            if(skipped == END_OF_STREAM) {
+                return;
+            }
+
+            toSkip -= skipped;
+            curOffset += skipped;
         }
-        return temp;
+
+        if(toSkip > 0) {
+            throw new ArrayIndexOutOfBoundsException("Reached end of stream whilst trying to seek to region start. regionOffset=" + regionOffset + ", curOffset=" + curOffset);
+        }
     }
 }
