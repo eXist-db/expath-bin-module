@@ -752,6 +752,7 @@
 
         <builtin-modules>
             <module uri="http://exist-db.org/xquery/util" class="org.exist.xquery.functions.util.UtilModule"/>
+            <module uri="http://exist-db.org/xquery/xmldb" class="org.exist.xquery.functions.xmldb.XMLDBModule"/>
             <module uri="http://expath.org/ns/binary" class="org.exist.xquery.modules.expath.bin.ExpathBinModule"/>
         </builtin-modules>
     </xquery>
