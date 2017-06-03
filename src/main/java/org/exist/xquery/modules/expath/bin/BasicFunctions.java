@@ -255,7 +255,9 @@ public class BasicFunctions extends BasicFunction {
     private IntegerValue length(final BinaryValue binValue) throws XPathException {
         final byte buf[] = new byte[4096];
         long len = 0;
-        try(final InputStream is = binValue.getInputStream()) {
+        try {
+            // we don't need to close the stream, it will be closed by BinaryValueFromInputStream when it goes out of context
+            final InputStream is = binValue.getInputStream();
             int read = -1;
             while((read = is.read(buf)) > -1) {
                 len += read;
