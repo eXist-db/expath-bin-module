@@ -29,6 +29,7 @@ package org.exist.xquery.modules.expath.bin;
 import gnu.crypto.util.Base64;
 import org.exist.test.ExistXmldbEmbeddedServer;
 import org.exist.util.FileUtils;
+import org.exist.xmldb.EXistResource;
 import org.exist.xquery.XPathException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -84,6 +85,7 @@ public class BasicFunctionsTest {
 
             imgFile = getTestResource(TEST_IMG_FILE_NAME);
             final Resource imgResource = testCollection.createResource(TEST_IMG_FILE_NAME, BinaryResource.RESOURCE_TYPE);
+            ((EXistResource)imgResource).setMimeType("image/jpeg");
             imgResource.setContent(imgFile);
             testCollection.storeResource(imgResource);
 
@@ -240,6 +242,47 @@ public class BasicFunctionsTest {
     }
 
     @Test
+    public void twoParts() throws XMLDBException, IOException {
+        final String query =
+                "(\n"
+                + "    bin:part(util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_IMG_FILE_NAME + "'), 0, 10),\n"
+                + "    bin:part(util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_IMG_FILE_NAME + "'), 50000, 10)\n"
+                +")";
+
+        final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
+        assertEquals(2, resourceSet.getSize());
+
+        final byte[] expectedPart1 = readFilePart(imgFile, 0, 10);
+        final byte[] expectedPart2 = readFilePart(imgFile, 50000, 10);
+        final byte[] part1 = Base64.decode(resourceSet.getResource(0).getContent().toString());
+        final byte[] part2 = Base64.decode(resourceSet.getResource(1).getContent().toString());
+
+        assertArrayEquals(expectedPart1, part1);
+        assertArrayEquals(expectedPart2, part2);
+    }
+
+    @Test
+    public void twoParts_reuseDoc() throws XMLDBException, IOException {
+        final String query =
+                "let $bin-doc := util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_IMG_FILE_NAME + "')\n"
+                + "return (\n"
+                + "    bin:part($bin-doc, 0, 10),\n"
+                + "    bin:part($bin-doc, 50000, 10)\n"
+                +")";
+
+        final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
+        assertEquals(2, resourceSet.getSize());
+
+        final byte[] expectedPart1 = readFilePart(imgFile, 0, 10);
+        final byte[] expectedPart2 = readFilePart(imgFile, 50000, 10);
+        final byte[] part1 = Base64.decode(resourceSet.getResource(0).getContent().toString());
+        final byte[] part2 = Base64.decode(resourceSet.getResource(1).getContent().toString());
+
+        assertArrayEquals(expectedPart1, part1);
+        assertArrayEquals(expectedPart2, part2);
+    }
+
+    @Test
     public void parts() throws XMLDBException, IOException {
         final int[] offsets = {1097, 27931, 49288, 98576, 4857600};
         final int size = 21234;
@@ -273,7 +316,7 @@ public class BasicFunctionsTest {
     }
 
     @Test
-    public void parts_reuseDoc() throws XMLDBException, IOException {
+    public void parts_reuseBinDoc() throws XMLDBException, IOException {
         final int[] offsets = {1097, 27931, 49288, 98576, 4857600};
         final int size = 21234;
 
@@ -590,6 +633,27 @@ public class BasicFunctionsTest {
         }
     }
 
+    @Test
+    public void integration_join_parts() throws XMLDBException, UnsupportedEncodingException {
+        final String query =
+                "import module namespace util = \"http://exist-db.org/xquery/util\";\n"
+                + "import module namespace bin = \"http://expath.org/ns/binary\";\n"
+                + "\n"
+                + "let $data := util:base64-encode('ohhaithere!icanhazcheezburger?')\n"
+                + "let $part1 := bin:part($data, 0, 2)\n"
+                + "let $part2 := bin:part($data, 5, 5)\n"
+                + "let $part3 := bin:part($data, 18, 5)\n"
+                + "let $part4 := bin:part($data, 10, 1)\n"
+                + "return\n"
+                + "    bin:join(($part1, $part2, $part3, $part4)) cast as xs:string";
+
+        final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
+        assertEquals(1, resourceSet.getSize());
+
+        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
+        assertEquals("ohtherecheez!", actual);
+    }
+
     /**
      * Takes a binary file, breaks it into blocks,
      * joins the blocks together and stores them into
@@ -629,10 +693,10 @@ public class BasicFunctionsTest {
                 + "    return\n"
                 + "        bin:part($binary-file-data, $block-start, $block-length)\n"
                 + "return\n"
-                + "    let $local-joined-binary-file-path := xmldb:store('" + TEST_COLLECTION_NAME + "', 'joined_" + TEST_IMG_FILE_NAME + "', bin:join($blocks))\n"
+                + "    let $local-joined-binary-file-path := xmldb:store('" + TEST_COLLECTION_NAME + "', 'joined_" + TEST_IMG_FILE_NAME + "', bin:join($blocks), 'image/jpeg')\n"
                 + "    return\n"
-                + "(util:binary-doc($local-binary-file-path), util:binary-doc($local-joined-binary-file-path))";
-                //+ "        (util:hash(util:binary-doc($local-binary-file-path), 'sha256'), util:hash(util:binary-doc($local-joined-binary-file-path), 'sha256'))";
+                + "(util:binary-doc($local-binary-file-path) cast as xs:string, util:binary-doc($local-joined-binary-file-path) cast as xs:string)";
+
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
         assertEquals(2, resourceSet.getSize());
@@ -643,8 +707,6 @@ public class BasicFunctionsTest {
 
         assertArrayEquals(expectedBytes, storedBytes);
         assertArrayEquals(expectedBytes, storedJoinedBytes);
-
-//        assertEquals(resourceSet.getResource(0).getContent().toString(), resourceSet.getResource(1).getContent().toString());
     }
 
     private static Path getTestResource(final String filename) throws URISyntaxException {

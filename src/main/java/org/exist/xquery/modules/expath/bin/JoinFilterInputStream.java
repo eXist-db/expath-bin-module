@@ -89,6 +89,10 @@ public class JoinFilterInputStream extends FilterInputStream {
                 } else {
                     return totalRead;
                 }
+            } else {
+                // we read exactly the amount we were meant to
+                totalRead += read;
+                remainingLen -= read;
             }
         }
 
