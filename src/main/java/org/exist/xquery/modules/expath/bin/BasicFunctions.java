@@ -40,8 +40,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.exist.xquery.FunctionDSL.*;
 import static org.exist.xquery.modules.expath.bin.ExpathBinModule.*;
-import static org.exist.xquery.modules.expath.bin.FunctionSignatureHelpers.*;
 import static org.exist.xquery.modules.expath.bin.Utils.*;
 
 /**

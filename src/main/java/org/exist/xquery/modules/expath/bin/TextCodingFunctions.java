@@ -35,15 +35,14 @@ import org.exist.xquery.value.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Optional;
 
+import static org.exist.xquery.FunctionDSL.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.exist.xquery.modules.expath.bin.ExpathBinModule.*;
-import static org.exist.xquery.modules.expath.bin.FunctionSignatureHelpers.*;
 import static org.exist.xquery.modules.expath.bin.Utils.*;
 
 /**

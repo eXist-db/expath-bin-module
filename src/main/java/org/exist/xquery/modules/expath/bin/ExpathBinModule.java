@@ -27,17 +27,14 @@
 package org.exist.xquery.modules.expath.bin;
 
 import org.exist.dom.QName;
-import org.exist.xquery.AbstractInternalModule;
-import org.exist.xquery.ErrorCodes;
-import org.exist.xquery.FunctionDef;
-import org.exist.xquery.FunctionSignature;
+import org.exist.xquery.*;
 import org.exist.xquery.value.FunctionParameterSequenceType;
 import org.exist.xquery.value.FunctionReturnSequenceType;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.exist.xquery.modules.expath.bin.FunctionSignatureHelpers.functionDefs;
+import static org.exist.xquery.FunctionDSL.functionDefs;
 
 /**
  * Implementation of
@@ -106,11 +103,11 @@ public class ExpathBinModule extends AbstractInternalModule {
     }
 
     static FunctionSignature functionSignature(final String name, final String description, final FunctionReturnSequenceType returnType, final FunctionParameterSequenceType... paramTypes) {
-        return FunctionSignatureHelpers.functionSignature(new QName(name, NAMESPACE_URI), description, returnType, paramTypes);
+        return FunctionDSL.functionSignature(new QName(name, NAMESPACE_URI), description, returnType, paramTypes);
     }
 
     static FunctionSignature[] functionSignatures(final String name, final String description, final FunctionReturnSequenceType returnType, final FunctionParameterSequenceType[][] variableParamTypes) {
-        return FunctionSignatureHelpers.functionSignatures(new QName(name, NAMESPACE_URI), description, returnType, variableParamTypes);
+        return FunctionDSL.functionSignatures(new QName(name, NAMESPACE_URI), description, returnType, variableParamTypes);
     }
 
     static class ExpathBinModuleErrorCode extends ErrorCodes.ErrorCode {

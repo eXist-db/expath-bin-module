@@ -36,10 +36,10 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
+import static org.exist.xquery.FunctionDSL.*;
+import static org.exist.xquery.modules.expath.bin.ExpathBinModule.functionSignature;
 import static org.exist.xquery.modules.expath.bin.ExpathBinModule.ERROR_NON_NUMERIC_CHARACTER;
 import static org.exist.xquery.modules.expath.bin.ExpathBinModule.ERROR_OCTET_OUT_OF_RANGE;
-import static org.exist.xquery.modules.expath.bin.ExpathBinModule.functionSignature;
-import static org.exist.xquery.modules.expath.bin.FunctionSignatureHelpers.*;
 import static org.exist.xquery.modules.expath.bin.Utils.*;
 
 /**
