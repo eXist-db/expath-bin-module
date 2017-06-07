@@ -110,6 +110,21 @@ public class Utils {
         return Optional.empty();
     }
 
+    static Optional<String> getStringArg(final Sequence[] args, final int idx) throws XPathException {
+        if(args.length > idx) {
+            final Sequence arg = args[idx];
+            if (!arg.isEmpty()) {
+
+                final Item item = arg.itemAt(0);
+                if (item != null) {
+                    return Optional.ofNullable(item.toJavaObject(String.class));
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
     static BinaryValue newEmptyBinary(final XQueryContext context) throws XPathException {
         return newInMemoryBinary(context, new byte[0]);
     }

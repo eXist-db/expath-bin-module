@@ -71,7 +71,15 @@ public class ExpathBinModule extends AbstractInternalModule {
                     BasicFunctions.FS_PAD_LEFT[1],
                     BasicFunctions.FS_PAD_RIGHT[0],
                     BasicFunctions.FS_PAD_RIGHT[1],
-                    BasicFunctions.FS_FIND)
+                    BasicFunctions.FS_FIND),
+
+            functionDefs(TextCodingFunctions.class,
+                    TextCodingFunctions.FS_DECODE_STRING[0],
+                    TextCodingFunctions.FS_DECODE_STRING[1],
+                    TextCodingFunctions.FS_DECODE_STRING[2],
+                    TextCodingFunctions.FS_DECODE_STRING[3],
+                    TextCodingFunctions.FS_ENCODE_STRING[0],
+                    TextCodingFunctions.FS_ENCODE_STRING[1])
     );
 
     public ExpathBinModule(final Map<String, List<? extends Object>> parameters) {

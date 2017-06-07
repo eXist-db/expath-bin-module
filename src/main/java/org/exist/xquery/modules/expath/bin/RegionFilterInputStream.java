@@ -71,6 +71,12 @@ public class RegionFilterInputStream extends FilterInputStream {
         if(data > END_OF_STREAM) {
             curOffset++;
         }
+
+        if(data == END_OF_STREAM && curOffset < regionOffset + regionLen) {
+            // reached end of stream before all bytes were read
+            throw new IndexOutOfRangeException("Reached underlying END_OF_STREAM, before end of region");
+        }
+
         return data;
     }
 
@@ -93,6 +99,11 @@ public class RegionFilterInputStream extends FilterInputStream {
         final int read = in.read(b, off, len);
         if(read > END_OF_STREAM) {
             curOffset += read;
+        }
+
+        if(read < len && curOffset < regionOffset + regionLen) {
+            // reached end of stream before all bytes were read
+            throw new IndexOutOfRangeException("Reached underlying END_OF_STREAM, before end of region");
         }
 
         return read;
@@ -145,6 +156,12 @@ public class RegionFilterInputStream extends FilterInputStream {
 
         if(toSkip > 0) {
             throw new ArrayIndexOutOfBoundsException("Reached end of stream whilst trying to seek to region start. regionOffset=" + regionOffset + ", curOffset=" + curOffset);
+        }
+    }
+
+    public static class IndexOutOfRangeException extends IOException {
+        public IndexOutOfRangeException(String message) {
+            super(message);
         }
     }
 }
