@@ -53,6 +53,18 @@ public class FunctionSignatureHelpers {
         );
     }
 
+    /**
+     * An optional  DSL convenience method for function parameter types
+     * that may make the function signature DSL more readable
+     *
+     * @param paramTypes The parameter types
+     *
+     * @return The parameter types
+     */
+    public static FunctionParameterSequenceType[] params(final FunctionParameterSequenceType... paramTypes) {
+        return paramTypes;
+    }
+
     public static FunctionParameterSequenceType optParam(final String name, final int type, final String description) {
         return param(name, type, Cardinality.ZERO_OR_ONE, description);
     }
@@ -73,7 +85,16 @@ public class FunctionSignatureHelpers {
         return new FunctionParameterSequenceType(name, type, cardinality, description);
     }
 
-    public static FunctionParameterSequenceType[][] variableParams(final FunctionParameterSequenceType[]... variableParamTypes) {
+    /**
+     *
+     */
+    public static FunctionSignature[] functionSignatures(final QName name, final String description, final FunctionReturnSequenceType returnType, final FunctionParameterSequenceType[][] variableParamTypes) {
+        return Arrays.stream(variableParamTypes)
+                .map(paramTypes -> functionSignature(name, description, returnType, paramTypes))
+                .toArray(FunctionSignature[]::new);
+    }
+
+    public static FunctionParameterSequenceType[][] arities(final FunctionParameterSequenceType[]... variableParamTypes) {
         return variableParamTypes;
     }
 

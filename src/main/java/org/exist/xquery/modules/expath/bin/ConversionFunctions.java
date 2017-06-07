@@ -135,7 +135,7 @@ public class ConversionFunctions extends BasicFunction {
                 }
 
             default:
-                throw new XPathException(this, "No function named: " + getName());
+                throw new XPathException(this, "No function: " + getName() + "#" + getSignature().getArgumentCount());
         }
     }
 

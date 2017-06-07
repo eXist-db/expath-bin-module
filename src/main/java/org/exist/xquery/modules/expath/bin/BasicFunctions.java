@@ -65,7 +65,7 @@ public class BasicFunctions extends BasicFunction {
             FS_PART_NAME,
             "Returns a specified part of binary data.",
             returnsOpt(Type.BASE64_BINARY),
-            variableParams(
+            arities(
                 arity(
                     FS_OPT_PARAM_IN,
                     FS_PART_PARAM_OFFSET
@@ -91,9 +91,11 @@ public class BasicFunctions extends BasicFunction {
             FS_INSERT_BEFORE_NAME,
             "Returns a specified part of binary data.",
             returnsOpt(Type.BASE64_BINARY),
-            FS_OPT_PARAM_IN,
-            param("offset", Type.INTEGER, "The offset to insert at"),
-            optParam("extra", Type.BASE64_BINARY, "The binary data to insert")
+            params(
+                FS_OPT_PARAM_IN,
+                param("offset", Type.INTEGER, "The offset to insert at"),
+                optParam("extra", Type.BASE64_BINARY, "The binary data to insert")
+            )
     );
 
     private static final String FS_PAD_LEFT_NAME = "pad-left";
@@ -102,7 +104,7 @@ public class BasicFunctions extends BasicFunction {
             FS_PAD_LEFT_NAME,
             "Returns the binary data created by padding $in with $size octets from the left. The padding octet values are $octet or zero if omitted.",
             returnsOpt(Type.BASE64_BINARY),
-            variableParams(
+            arities(
                     arity(
                             FS_OPT_PARAM_IN,
                             FS_PAD_LEFT_SIZE_PARAM
@@ -121,7 +123,7 @@ public class BasicFunctions extends BasicFunction {
             FS_PAD_RIGHT_NAME,
             "Returns the binary data created by padding $in with $size blank octets from the right. The padding octet values are $octet or zero if omitted.",
             returnsOpt(Type.BASE64_BINARY),
-            variableParams(
+            arities(
                     arity(
                             FS_OPT_PARAM_IN,
                             FS_PAD_LEFT_SIZE_PARAM
@@ -139,9 +141,11 @@ public class BasicFunctions extends BasicFunction {
             FS_FIND_NAME,
             "The function returns the first location of the binary search sequence in the input, or if not found, the empty sequence.",
             returnsOpt(Type.INTEGER),
-            FS_OPT_PARAM_IN,
-            param("offset", Type.INTEGER, "The offset to start searching from"),
-            param("search", Type.BASE64_BINARY, "The binary data to search for")
+            params(
+                FS_OPT_PARAM_IN,
+                param("offset", Type.INTEGER, "The offset to start searching from"),
+                param("search", Type.BASE64_BINARY, "The binary data to search for")
+            )
     );
 
 
@@ -248,7 +252,7 @@ public class BasicFunctions extends BasicFunction {
                 }
 
             default:
-                throw new XPathException(this, "No function named: " + getName());
+                throw new XPathException(this, "No function: " + getName() + "#" + getSignature().getArgumentCount());
         }
     }
 

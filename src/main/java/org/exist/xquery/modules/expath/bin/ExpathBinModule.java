@@ -34,7 +34,6 @@ import org.exist.xquery.FunctionSignature;
 import org.exist.xquery.value.FunctionParameterSequenceType;
 import org.exist.xquery.value.FunctionReturnSequenceType;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -111,9 +110,7 @@ public class ExpathBinModule extends AbstractInternalModule {
     }
 
     static FunctionSignature[] functionSignatures(final String name, final String description, final FunctionReturnSequenceType returnType, final FunctionParameterSequenceType[][] variableParamTypes) {
-        return Arrays.stream(variableParamTypes)
-                .map(paramTypes -> functionSignature(name, description, returnType, paramTypes))
-                .toArray(FunctionSignature[]::new);
+        return FunctionSignatureHelpers.functionSignatures(new QName(name, NAMESPACE_URI), description, returnType, variableParamTypes);
     }
 
     static class ExpathBinModuleErrorCode extends ErrorCodes.ErrorCode {
