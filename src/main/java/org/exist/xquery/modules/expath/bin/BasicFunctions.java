@@ -225,7 +225,7 @@ public class BasicFunctions extends BasicFunction {
                     } else {
                         octet = BigInteger.ZERO;
                     }
-                    if(octet.compareTo(BigInteger.ZERO) < 0 || octet.compareTo(BigInteger.valueOf(0xff)) > 1) {
+                    if(octet.compareTo(BigInteger.ZERO) < 0 || octet.compareTo(BigInteger.valueOf(0xff)) > 0) {
                         throw new XPathException(this, ERROR_OCTET_OUT_OF_RANGE, "$octet: " + octet + " is out of range");
                     }
 
