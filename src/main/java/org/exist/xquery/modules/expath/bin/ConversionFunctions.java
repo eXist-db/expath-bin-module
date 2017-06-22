@@ -169,14 +169,13 @@ public class ConversionFunctions extends BasicFunction {
                 throw new XPathException(this, ERROR_NON_NUMERIC_CHARACTER, e);
             }
         }
-
-        return BinaryValueFromInputStream.getInstance(context, new Base64BinaryValueType(), new ByteArrayInputStream(data));
+        return Utils.newInMemoryBinary(context, data);
     }
 
     private BinaryValue octal(final String octalDigits) throws XPathException {
         try {
             final byte data[] = new BigInteger(octalDigits, 8).toByteArray();
-            return BinaryValueFromInputStream.getInstance(context, new Base64BinaryValueType(), new ByteArrayInputStream(data));
+            return Utils.newInMemoryBinary(context, data);
         } catch(final NumberFormatException e) {
             throw new XPathException(this, ERROR_NON_NUMERIC_CHARACTER, e);
         }
