@@ -27,10 +27,14 @@
 package org.exist.xquery.modules.expath.bin;
 
 import net.jcip.annotations.NotThreadSafe;
+import org.exist.xquery.ErrorCodes;
+import org.exist.xquery.XPathErrorProvider;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import static org.exist.xquery.modules.expath.bin.ExpathBinModule.ERROR_INDEX_OUT_OF_RANGE;
 
 /**
  * Created by aretter on 24/05/2017.
@@ -159,9 +163,14 @@ public class RegionFilterInputStream extends FilterInputStream {
         }
     }
 
-    public static class IndexOutOfRangeException extends IOException {
-        public IndexOutOfRangeException(String message) {
+    public static class IndexOutOfRangeException extends IOException implements XPathErrorProvider {
+        public IndexOutOfRangeException(final String message) {
             super(message);
+        }
+
+        @Override
+        public ErrorCodes.ErrorCode getErrorCode() {
+            return ERROR_INDEX_OUT_OF_RANGE;
         }
     }
 }
