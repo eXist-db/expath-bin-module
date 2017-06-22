@@ -147,20 +147,20 @@ public class ConversionFunctions extends BasicFunction {
         }
     }
 
-    private BinaryValue bin(final String binaryDigits) throws XPathException {
-        int len = (int)Math.ceil(binaryDigits.length() / 8);
+    private BinaryValue bin(String binaryDigits) throws XPathException {
+        int len = (int)Math.ceil((float)binaryDigits.length() / 8);
         if(binaryDigits.length() > 0 && len == 0) {
             len = 1;
         }
 
+        // zero-padded from the left to generate an integral number of octets
+        binaryDigits = StringUtils.leftPad(binaryDigits, len * 8, '0');
+
         final byte data[] = new byte[len];
         for(int i = 0; i < len; i++) {
             final int start = i * 8;
-            final int end = start + 8 > binaryDigits.length() - 1 ? binaryDigits.length() - 1 : start + 8;
-            String bins = binaryDigits.substring(start, end);
-            if(bins.length() != 8) {
-                bins = StringUtils.leftPad(bins, 8 - bins.length(), '0');
-            }
+            final int end = start + 8 > binaryDigits.length() ? binaryDigits.length() : start + 8;
+            final String bins = binaryDigits.substring(start, end);
 
             try {
                 final byte b = (byte)Integer.parseUnsignedInt(bins, 2);
@@ -170,10 +170,7 @@ public class ConversionFunctions extends BasicFunction {
             }
         }
 
-//        final byte data[] = new BigInteger(binaryDigits, 2).toByteArray();
-
         return BinaryValueFromInputStream.getInstance(context, new Base64BinaryValueType(), new ByteArrayInputStream(data));
-
     }
 
     private BinaryValue octal(final String octalDigits) throws XPathException {

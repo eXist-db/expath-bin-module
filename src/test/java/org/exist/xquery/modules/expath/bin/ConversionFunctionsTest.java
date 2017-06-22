@@ -122,6 +122,26 @@ public class ConversionFunctionsTest {
     }
 
     @Test
+    public void bin_2() throws XMLDBException {
+        final String query =
+                "import module namespace bin = \"http://expath.org/ns/binary\";\n"
+                        + "bin:bin(\"1000111010101\")";
+
+        final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
+        assertEquals("EdU=", resourceSet.getResource(0).getContent());
+    }
+
+    @Test
+    public void bin_3() throws XMLDBException {
+        final String query =
+                "import module namespace bin = \"http://expath.org/ns/binary\";\n"
+                        + "bin:bin(\"1101000111010101100011101010111010101000000101\")";
+
+        final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
+        assertEquals("NHVjq6oF", resourceSet.getResource(0).getContent());
+    }
+
+    @Test
     public void bin_empty() throws XMLDBException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
