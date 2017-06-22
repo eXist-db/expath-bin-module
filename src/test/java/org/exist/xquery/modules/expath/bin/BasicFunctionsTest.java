@@ -220,13 +220,14 @@ public class BasicFunctionsTest {
 
     @Test
     public void part_overflow() throws XMLDBException, IOException {
-        final int offset = (int)FileUtils.sizeQuietly(binFile) - 256;
-        final int size = 1024 * 1024;
+        final int fileSize = (int)FileUtils.sizeQuietly(binFile);
+        final int offset = fileSize - 256;
+        final int size = fileSize * 2;
 
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "import module namespace util = \"http://exist-db.org/xquery/util\";\n"
-                        + "bin:part(util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_BIN_FILE_NAME + "'), " + offset + ", " + size + ")";
+                        + "bin:part(util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_BIN_FILE_NAME + "'), " + offset + ", " + size + ") cast as xs:string";
         try {
             existXmldbEmbeddedServer.executeQuery(query);
             fail("Expected error bin:index-out-of-range");
@@ -457,7 +458,7 @@ public class BasicFunctionsTest {
 
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
-                + "bin:insert-before(xs:base64Binary(\"" + base64Data1 + "\"), 100, xs:base64Binary(\"" + base64Data2 + "\"))";
+                + "bin:insert-before(xs:base64Binary(\"" + base64Data1 + "\"), 100, xs:base64Binary(\"" + base64Data2 + "\")) cast as xs:string";
 
         try {
             existXmldbEmbeddedServer.executeQuery(query);
