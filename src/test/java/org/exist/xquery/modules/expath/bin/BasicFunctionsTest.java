@@ -776,6 +776,78 @@ public class BasicFunctionsTest {
         assertEquals(330, Integer.parseInt(resourceSet.getResource(1089).getContent().toString()));
     }
 
+    @Test
+    public void integration_length_part_loop() throws XMLDBException, IOException, URISyntaxException {
+        final String query =
+                "import module namespace util = \"http://exist-db.org/xquery/util\";\n"
+                + "import module namespace bin = \"http://expath.org/ns/binary\";\n"
+                + "import module namespace xmldb = \"http://exist-db.org/xquery/xmldb\";\n"
+                + "\n"
+                + "let $block-size := 1000\n"
+                + "let $local-binary-file-path := '/db/" + TEST_COLLECTION_NAME + "/" + TEST_IMG_FILE_NAME + "'\n"
+                + "let $binary-file-data := util:binary-doc($local-binary-file-path)\n"
+                + "let $total-size := bin:length($binary-file-data)\n"
+                + "\n"
+                + "let $num-blocks := 3\n"
+                + "return\n"
+                + "    for $i in (0 to $num-blocks - 1)\n"
+                + "    let $block-start := $i * $block-size\n"
+                + "    let $block-length :=\n"
+                + "        if($block-start + $block-size gt $total-size) then\n"
+                + "            $total-size - $block-start\n"
+                + "        else\n"
+                + "            $block-size\n"
+                + "    let $part := bin:part($binary-file-data, $block-start, $block-length)\n"
+                + "    return\n"
+                + "       $part cast as xs:string";
+
+        final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
+        assertEquals(3, resourceSet.getSize());
+
+        final byte[] expectedBytes1 = readFilePart(getTestResource(TEST_IMG_FILE_NAME), 0, 1000);
+        final byte[] storedBytes1 = Base64.decode(resourceSet.getResource(0).getContent().toString());
+        assertArrayEquals(expectedBytes1, storedBytes1);
+
+        final byte[] expectedBytes2 = readFilePart(getTestResource(TEST_IMG_FILE_NAME), 1000, 1000);
+        final byte[] storedBytes2 = Base64.decode(resourceSet.getResource(1).getContent().toString());
+        assertArrayEquals(expectedBytes2, storedBytes2);
+
+        final byte[] expectedBytes3 = readFilePart(getTestResource(TEST_IMG_FILE_NAME), 2000, 1000);
+        final byte[] storedBytes3 = Base64.decode(resourceSet.getResource(2).getContent().toString());
+        assertArrayEquals(expectedBytes3, storedBytes3);
+    }
+
+    @Test
+    public void integration_length_part_length_loop() throws XMLDBException, IOException, URISyntaxException {
+        final String query =
+                "import module namespace util = \"http://exist-db.org/xquery/util\";\n"
+                        + "import module namespace bin = \"http://expath.org/ns/binary\";\n"
+                        + "import module namespace xmldb = \"http://exist-db.org/xquery/xmldb\";\n"
+                        + "\n"
+                        + "let $block-size := 1000\n"
+                        + "let $local-binary-file-path := '/db/" + TEST_COLLECTION_NAME + "/" + TEST_IMG_FILE_NAME + "'\n"
+                        + "let $binary-file-data := util:binary-doc($local-binary-file-path)\n"
+                        + "let $total-size := bin:length($binary-file-data)\n"
+                        + "let $num-blocks := 2\n"
+                        + "return\n"
+                        + "\n"
+                        + "    for $i in (0 to $num-blocks - 1)\n"
+                        + "    let $block-start := $i * $block-size\n"
+                        + "    let $block-length :=\n"
+                        + "        if($block-start + $block-size gt $total-size) then\n"
+                        + "            $total-size - $block-start\n"
+                        + "        else\n"
+                        + "            $block-size\n"
+                        + "    let $part := bin:part($binary-file-data, $block-start, $block-length)\n"
+                        + "    return\n"
+                        + "       bin:length($part)";
+
+        final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
+        assertEquals(2, resourceSet.getSize());
+        assertEquals(1000, Long.parseLong(resourceSet.getResource(0).getContent().toString()));
+        assertEquals(1000, Long.parseLong(resourceSet.getResource(1).getContent().toString()));
+    }
+
     private static Path getTestResource(final String filename) throws URISyntaxException {
         final URL url = BasicFunctionsTest.class.getClassLoader().getResource(filename);
         return Paths.get(url.toURI());

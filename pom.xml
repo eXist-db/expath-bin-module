@@ -40,7 +40,7 @@
 
     <properties>
         <bin.module.namespace>http://expath.org/ns/binary</bin.module.namespace>
-        <exist.version>20170622</exist.version>     <!-- TODO switch to release version -->
+        <exist.version>201706271929-SNAPSHOT</exist.version>     <!-- TODO switch to release version -->
         <commons.lang.version>3.5</commons.lang.version>
 
         <java.version>1.8</java.version>
