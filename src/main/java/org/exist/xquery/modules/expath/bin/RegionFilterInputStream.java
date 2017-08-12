@@ -27,6 +27,7 @@
 package org.exist.xquery.modules.expath.bin;
 
 import net.jcip.annotations.NotThreadSafe;
+import org.exist.util.io.CachingFilterInputStream;
 import org.exist.xquery.ErrorCodes;
 import org.exist.xquery.XPathErrorProvider;
 
@@ -59,6 +60,10 @@ public class RegionFilterInputStream extends FilterInputStream {
         super(in);
         this.regionOffset = regionOffset;
         this.regionLen = regionLen;
+        if (in instanceof CachingFilterInputStream) {
+            final CachingFilterInputStream cachingFilterInputStream = (CachingFilterInputStream) in;
+            cachingFilterInputStream.incrementSharedReferences();
+        }
     }
 
     @Override

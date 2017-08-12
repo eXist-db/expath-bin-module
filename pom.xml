@@ -43,7 +43,8 @@
         <project.build.source>1.8</project.build.source>
         <project.build.target>1.8</project.build.target>
 
-        <exist.version>201706271929-SNAPSHOT</exist.version>     <!-- TODO switch to release version -->
+        <exist.version>3.4.0</exist.version>
+
         <commons.lang.version>3.5</commons.lang.version>
 
         <bin.module.namespace>http://expath.org/ns/binary</bin.module.namespace>

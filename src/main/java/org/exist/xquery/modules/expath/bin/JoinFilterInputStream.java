@@ -26,6 +26,8 @@
  */
 package org.exist.xquery.modules.expath.bin;
 
+import org.exist.util.io.CachingFilterInputStream;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +45,11 @@ public class JoinFilterInputStream extends FilterInputStream {
     public JoinFilterInputStream(final InputStream[] ins) {
         super(ins[0]);
         this.ins = ins;
+        for(final InputStream in : ins) {
+            if (in instanceof CachingFilterInputStream) {
+                ((CachingFilterInputStream) in).incrementSharedReferences();
+            }
+        }
     }
 
     @Override
