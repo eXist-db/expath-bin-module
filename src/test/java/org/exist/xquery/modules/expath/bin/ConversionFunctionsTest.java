@@ -45,7 +45,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
- * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 public class ConversionFunctionsTest {
 

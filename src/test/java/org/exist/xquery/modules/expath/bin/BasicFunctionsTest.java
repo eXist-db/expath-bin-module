@@ -58,7 +58,7 @@ import static org.junit.Assert.fail;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 public class BasicFunctionsTest {
 

@@ -41,7 +41,7 @@ import static org.exist.xquery.FunctionDSL.functionDefs;
  * <a href="http://expath.org/spec/binary">EXPath Bin Module</a> 1.0
  * for eXist-db
  *
- * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 public class ExpathBinModule extends AbstractInternalModule {
 

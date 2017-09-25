@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by aretter on 24/05/2017.
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 public class JoinFilterInputStream extends FilterInputStream {
 

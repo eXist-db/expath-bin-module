@@ -35,7 +35,7 @@ import java.math.BigInteger;
 import java.util.Optional;
 
 /**
- * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 public class Utils {
 

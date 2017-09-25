@@ -45,7 +45,7 @@ import static org.exist.xquery.modules.expath.bin.ExpathBinModule.*;
 import static org.exist.xquery.modules.expath.bin.Utils.*;
 
 /**
- * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 public class BasicFunctions extends BasicFunction {
 

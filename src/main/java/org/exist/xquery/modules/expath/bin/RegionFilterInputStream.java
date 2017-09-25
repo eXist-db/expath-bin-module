@@ -38,7 +38,7 @@ import java.io.InputStream;
 import static org.exist.xquery.modules.expath.bin.ExpathBinModule.ERROR_INDEX_OUT_OF_RANGE;
 
 /**
- * Created by aretter on 24/05/2017.
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 @NotThreadSafe
 public class RegionFilterInputStream extends FilterInputStream {

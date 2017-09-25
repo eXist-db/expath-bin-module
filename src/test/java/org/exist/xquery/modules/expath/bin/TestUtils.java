@@ -33,7 +33,7 @@ import java.nio.file.Path;
 import java.util.Random;
 
 /**
- * @author <a href="mailto: adam@evolvedbinary.com">Adam Retter</a>
+ * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
  */
 public class TestUtils {
     static String TEST_COLLECTION_NAME = "expath-bin-module-test";
