@@ -28,6 +28,7 @@ package org.exist.xquery.modules.expath.bin;
 
 import gnu.crypto.util.Base64;
 import org.exist.test.ExistXmldbEmbeddedServer;
+import org.exist.xmldb.EXistResource;
 import org.exist.xquery.XPathException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,6 +42,7 @@ import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.exist.xquery.modules.expath.bin.TestUtils.*;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -72,13 +74,15 @@ public class ConversionFunctionsTest {
     }
 
     @Test
-    public void hex() throws XMLDBException {
+    public void hex() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                 + "bin:hex(\"11223F4E\")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("ESI/Tg==", resourceSet.getResource(0).getContent());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("ESI/Tg==", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test
@@ -112,33 +116,39 @@ public class ConversionFunctionsTest {
     }
 
     @Test
-    public void bin() throws XMLDBException {
+    public void bin() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:bin(\"1101000111010101\")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("0dU=", resourceSet.getResource(0).getContent());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("0dU=", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test
-    public void bin_2() throws XMLDBException {
+    public void bin_2() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:bin(\"1000111010101\")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("EdU=", resourceSet.getResource(0).getContent());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("EdU=", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test
-    public void bin_3() throws XMLDBException {
+    public void bin_3() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:bin(\"1101000111010101100011101010111010101000000101\")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("NHVjq6oF", resourceSet.getResource(0).getContent());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("NHVjq6oF", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test
@@ -172,13 +182,15 @@ public class ConversionFunctionsTest {
     }
 
     @Test
-    public void octal() throws XMLDBException {
+    public void octal() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:octal(\"11223047\")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("JSYn", resourceSet.getResource(0).getContent());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("JSYn", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test
@@ -238,23 +250,27 @@ public class ConversionFunctionsTest {
     }
 
     @Test
-    public void fromOctets() throws XMLDBException {
+    public void fromOctets() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:from-octets((104, 101, 108, 108, 111))";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("aGVsbG8=", resourceSet.getResource(0).getContent());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("aGVsbG8=", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test
-    public void fromOctets_empty() throws XMLDBException {
+    public void fromOctets_empty() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:from-octets(())";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("", resourceSet.getResource(0).getContent());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertArrayEquals(new byte[0], (byte[])resource.getContent());
+        }
     }
 
     @Test

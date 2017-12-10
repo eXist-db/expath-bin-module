@@ -26,12 +26,16 @@
  */
 package org.exist.xquery.modules.expath.bin;
 
+import gnu.crypto.util.Base64;
 import org.exist.test.ExistXmldbEmbeddedServer;
+import org.exist.xmldb.EXistResource;
 import org.exist.xquery.XPathException;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.base.XMLDBException;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -184,7 +188,7 @@ public class TextCodingFunctionsTest {
     }
 
     @Test
-    public void encode() throws XMLDBException {
+    public void encode() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:encode-string('ohdearwhatwentwrong')";
@@ -192,7 +196,9 @@ public class TextCodingFunctionsTest {
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
         assertEquals(1, resourceSet.getSize());
 
-        assertEquals("b2hkZWFyd2hhdHdlbnR3cm9uZw==", resourceSet.getResource(0).getContent().toString());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("b2hkZWFyd2hhdHdlbnR3cm9uZw==", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test
@@ -206,7 +212,7 @@ public class TextCodingFunctionsTest {
     }
 
     @Test
-    public void encode_encoding() throws XMLDBException {
+    public void encode_encoding() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                         + "bin:encode-string('iwouldliketotryagain', 'CP037')";
@@ -214,7 +220,9 @@ public class TextCodingFunctionsTest {
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
         assertEquals(1, resourceSet.getSize());
 
-        assertEquals("iaaWpJOEk4mShaOWo5mogYeBiZU=", resourceSet.getResource(0).getContent().toString());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("iaaWpJOEk4mShaOWo5mogYeBiZU=", Base64.encode((byte[])resource.getContent()));
+        }
     }
 
     @Test

@@ -52,10 +52,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.exist.xquery.modules.expath.bin.TestUtils.*;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.*;
 
 /**
  * @author <a href="mailto:adam@evolvedbinary.com">Adam Retter</a>
@@ -123,11 +121,14 @@ public class BasicFunctionsTest {
                 + "bin:part(util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_BIN_FILE_NAME + "'), " + offset + ")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final byte[] part = Base64.decode(resourceSet.getResource(0).getContent().toString());
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
 
-        final byte[] expectedPart = Files.readAllBytes(binFile);
+            final byte[] part = (byte[]) resource.getContent();
+            final byte[] expectedPart = Files.readAllBytes(binFile);
 
-        assertArrayEquals(expectedPart, part);
+            assertArrayEquals(expectedPart, part);
+        }
     }
 
     @Test
@@ -141,11 +142,14 @@ public class BasicFunctionsTest {
                 + "bin:part(util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_BIN_FILE_NAME + "'), " + offset + ", " + size + ")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final byte[] part = Base64.decode(resourceSet.getResource(0).getContent().toString());
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
 
-        final byte[] expectedPart = readFilePart(binFile, offset, size);
+            final byte[] part = (byte[]) resource.getContent();
+            final byte[] expectedPart = readFilePart(binFile, offset, size);
 
-        assertArrayEquals(expectedPart, part);
+            assertArrayEquals(expectedPart, part);
+        }
     }
 
     @Test
@@ -159,11 +163,14 @@ public class BasicFunctionsTest {
                 + "bin:part(util:binary-doc('/db/" + TEST_COLLECTION_NAME + "/" + TEST_BIN_FILE_NAME + "'), " + offset + ", " + size + ")";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final byte[] part = Base64.decode(resourceSet.getResource(0).getContent().toString());
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
 
-        final byte[] expectedPart = readFilePart(binFile, offset, size);
+            final byte[] part = (byte[]) resource.getContent();
+            final byte[] expectedPart = readFilePart(binFile, offset, size);
 
-        assertArrayEquals(expectedPart, part);
+            assertArrayEquals(expectedPart, part);
+        }
     }
 
     @Test
@@ -255,11 +262,19 @@ public class BasicFunctionsTest {
 
         final byte[] expectedPart1 = readFilePart(imgFile, 0, 10);
         final byte[] expectedPart2 = readFilePart(imgFile, 50000, 10);
-        final byte[] part1 = Base64.decode(resourceSet.getResource(0).getContent().toString());
-        final byte[] part2 = Base64.decode(resourceSet.getResource(1).getContent().toString());
 
-        assertArrayEquals(expectedPart1, part1);
-        assertArrayEquals(expectedPart2, part2);
+        try(final EXistResource res1 = (EXistResource)resourceSet.getResource(0);
+            final EXistResource res2 = (EXistResource)resourceSet.getResource(1)) {
+
+            assertEquals(BinaryResource.RESOURCE_TYPE, res1.getResourceType());
+            assertEquals(BinaryResource.RESOURCE_TYPE, res2.getResourceType());
+
+            final byte[] part1 = (byte[])res1.getContent();
+            final byte[] part2 = (byte[])res2.getContent();
+
+            assertArrayEquals(expectedPart1, part1);
+            assertArrayEquals(expectedPart2, part2);
+        }
     }
 
     @Test
@@ -276,11 +291,19 @@ public class BasicFunctionsTest {
 
         final byte[] expectedPart1 = readFilePart(imgFile, 0, 10);
         final byte[] expectedPart2 = readFilePart(imgFile, 50000, 10);
-        final byte[] part1 = Base64.decode(resourceSet.getResource(0).getContent().toString());
-        final byte[] part2 = Base64.decode(resourceSet.getResource(1).getContent().toString());
 
-        assertArrayEquals(expectedPart1, part1);
-        assertArrayEquals(expectedPart2, part2);
+        try(final EXistResource res1 = (EXistResource)resourceSet.getResource(0);
+            final EXistResource res2 = (EXistResource)resourceSet.getResource(1)) {
+
+            assertEquals(BinaryResource.RESOURCE_TYPE, res1.getResourceType());
+            assertEquals(BinaryResource.RESOURCE_TYPE, res2.getResourceType());
+
+            final byte[] part1 = (byte[])res1.getContent();
+            final byte[] part2 = (byte[])res2.getContent();
+
+            assertArrayEquals(expectedPart1, part1);
+            assertArrayEquals(expectedPart2, part2);
+        }
     }
 
     @Test
@@ -311,8 +334,12 @@ public class BasicFunctionsTest {
         for(int i = 0; i < offsets.length; i++) {
             final int offset = offsets[i];
             final byte[] expectedPart = readFilePart(binFile, offset, size);
-            final byte[] part = Base64.decode(resourceSet.getResource(i).getContent().toString());
-            assertArrayEquals(expectedPart, part);
+            try(final EXistResource resource = (EXistResource)resourceSet.getResource(i)) {
+                assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+                final byte[] part = (byte[])resource.getContent();
+                assertArrayEquals(expectedPart, part);
+            }
         }
     }
 
@@ -345,13 +372,17 @@ public class BasicFunctionsTest {
         for(int i = 0; i < offsets.length; i++) {
             final int offset = offsets[i];
             final byte[] expectedPart = readFilePart(binFile, offset, size);
-            final byte[] part = Base64.decode(resourceSet.getResource(i).getContent().toString());
-            assertArrayEquals("part " + i + " is not correct", expectedPart, part);
+            try (final EXistResource resource = (EXistResource)resourceSet.getResource(i)) {
+                assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+                final byte[] part = (byte[]) resource.getContent();
+                assertArrayEquals("part " + i + " is not correct", expectedPart, part);
+            }
         }
     }
 
     @Test
-    public void join() throws XMLDBException, UnsupportedEncodingException {
+    public void join() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("oh".getBytes(UTF_8));
         final String base64Data2 = Base64.encode("hai".getBytes(UTF_8));
         final String base64Data3 = Base64.encode("there".getBytes(UTF_8));
@@ -361,22 +392,28 @@ public class BasicFunctionsTest {
                 + "bin:join((xs:base64Binary(\"" + base64Data1 + "\"), xs:base64Binary(\"" + base64Data2 + "\"), xs:base64Binary(\"" + base64Data3 + "\")))";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("ohhaithere", actual);
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[]) resource.getContent(), UTF_8);
+            assertEquals("ohhaithere", actual);
+        }
     }
 
     @Test
-    public void join_empty() throws XMLDBException, UnsupportedEncodingException {
+    public void join_empty() throws XMLDBException, IOException {
         final String query =
                 "import module namespace bin = \"http://expath.org/ns/binary\";\n"
                 + "bin:join(())";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        assertEquals("", resourceSet.getResource(0).getContent().toString());
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals("", new String((byte[])resource.getContent(), UTF_8));
+        }
     }
 
     @Test
-    public void insertBefore() throws XMLDBException, UnsupportedEncodingException {
+    public void insertBefore() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("world".getBytes(UTF_8));
         final String base64Data2 = Base64.encode("hello".getBytes(UTF_8));
 
@@ -385,12 +422,16 @@ public class BasicFunctionsTest {
                 + "bin:insert-before(xs:base64Binary(\"" + base64Data1 + "\"), 0, xs:base64Binary(\"" + base64Data2 + "\"))";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("helloworld", actual);
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[]) resource.getContent(), UTF_8);
+            assertEquals("helloworld", actual);
+        }
     }
 
     @Test
-    public void insertBefore_offset() throws XMLDBException, UnsupportedEncodingException {
+    public void insertBefore_offset() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("world".getBytes(UTF_8));
         final String base64Data2 = Base64.encode("hello".getBytes(UTF_8));
 
@@ -399,8 +440,13 @@ public class BasicFunctionsTest {
                         + "bin:insert-before(xs:base64Binary(\"" + base64Data1 + "\"), 2, xs:base64Binary(\"" + base64Data2 + "\"))";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("wohellorld", actual);
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[]) resource.getContent(), UTF_8);
+
+            assertEquals("wohellorld", actual);
+        }
     }
 
     @Test
@@ -416,7 +462,7 @@ public class BasicFunctionsTest {
     }
 
     @Test
-    public void insertBefore_empty_extra() throws XMLDBException, UnsupportedEncodingException {
+    public void insertBefore_empty_extra() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("hello".getBytes(UTF_8));
 
         final String query =
@@ -424,8 +470,12 @@ public class BasicFunctionsTest {
                         + "bin:insert-before(xs:base64Binary(\"" + base64Data1 + "\"), 0, ())";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("hello", actual);
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[])resource.getContent(), UTF_8);
+            assertEquals("hello", actual);
+        }
     }
 
     @Test
@@ -475,7 +525,7 @@ public class BasicFunctionsTest {
     }
 
     @Test
-    public void padLeft() throws XMLDBException, UnsupportedEncodingException {
+    public void padLeft() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("123456789".getBytes(UTF_8));
 
         final String query =
@@ -483,12 +533,16 @@ public class BasicFunctionsTest {
                 + "bin:pad-left(xs:base64Binary(\"" + base64Data1 + "\"), 4)";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("\0\0\0\0" + "123456789", actual);
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[]) resource.getContent(), UTF_8);
+            assertEquals("\0\0\0\0" + "123456789", actual);
+        }
     }
 
     @Test
-    public void padLeft_octet() throws XMLDBException, UnsupportedEncodingException {
+    public void padLeft_octet() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("123456789".getBytes(UTF_8));
 
         final String query =
@@ -496,8 +550,12 @@ public class BasicFunctionsTest {
                 + "bin:pad-left(xs:base64Binary(\"" + base64Data1 + "\"), 4, 48)";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("0000123456789", actual);
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[])resource.getContent(), UTF_8);
+            assertEquals("0000123456789", actual);
+        }
     }
 
     @Test
@@ -555,7 +613,7 @@ public class BasicFunctionsTest {
     }
 
     @Test
-    public void padRight() throws XMLDBException, UnsupportedEncodingException {
+    public void padRight() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("123456789".getBytes(UTF_8));
 
         final String query =
@@ -563,12 +621,16 @@ public class BasicFunctionsTest {
                         + "bin:pad-left(xs:base64Binary(\"" + base64Data1 + "\"), 4)";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("\0\0\0\0" + "123456789", actual);
+        try(final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[])resource.getContent(), UTF_8);
+            assertEquals("\0\0\0\0" + "123456789", actual);
+        }
     }
 
     @Test
-    public void padRight_octet() throws XMLDBException, UnsupportedEncodingException {
+    public void padRight_octet() throws XMLDBException, IOException {
         final String base64Data1 = Base64.encode("123456789".getBytes(UTF_8));
 
         final String query =
@@ -576,8 +638,13 @@ public class BasicFunctionsTest {
                         + "bin:pad-left(xs:base64Binary(\"" + base64Data1 + "\"), 4, 48)";
 
         final ResourceSet resourceSet = existXmldbEmbeddedServer.executeQuery(query);
-        final String actual = new String(Base64.decode(resourceSet.getResource(0).getContent().toString()), UTF_8);
-        assertEquals("0000123456789", actual);
+        try (final EXistResource resource = (EXistResource)resourceSet.getResource(0)) {
+            assertEquals(BinaryResource.RESOURCE_TYPE, resource.getResourceType());
+
+            final String actual = new String((byte[]) resource.getContent(), UTF_8);
+
+            assertEquals("0000123456789", actual);
+        }
     }
 
     @Test

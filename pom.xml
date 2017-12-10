@@ -44,7 +44,7 @@
         <project.build.source>1.8</project.build.source>
         <project.build.target>1.8</project.build.target>
 
-        <exist.version>3.4.1</exist.version>
+	<exist.version>3.7.0-SNAPSHOT</exist.version>
 
         <commons.lang.version>3.5</commons.lang.version>
 
@@ -296,6 +296,10 @@
             <id>exist</id>
             <url>https://raw.github.com/eXist-db/mvn-repo/master/</url>
         </repository>
+	<repository>
+		<id>spring</id>
+		<url>http://repo.spring.io/milestone/</url>
+	</repository>
     </repositories>
 
     <pluginRepositories>
