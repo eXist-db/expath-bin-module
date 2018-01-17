@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <groupId>org.exist-db</groupId>
+        <artifactId>exist-apps-parent</artifactId>
+        <version>1.4</version>
         <relativePath />
     </parent>
 
@@ -36,27 +36,16 @@
         <connection>scm:git:https://www.github.com/exist-db/expath-bin-module.git</connection>
         <developerConnection>scm:git:https://www.github.com/exist-db/expath-bin-module.git</developerConnection>
         <url>scm:git:https://www.github.com/exist-db/expath-bin-module.git</url>
-    <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.source>1.8</project.build.source>
-        <project.build.target>1.8</project.build.target>
-
-	<exist.version>3.7.0-SNAPSHOT</exist.version>
-
+	    <exist.version>20171206-SNAPSHOT</exist.version>
         <commons.lang.version>3.5</commons.lang.version>
-
         <bin.module.namespace>http://expath.org/ns/binary</bin.module.namespace>
-        <java-package-name>org.exist.xquery.modules.expath.bin</java-package-name>
-        <java-package-main-class-name>ExpathBinModule</java-package-main-class-name>
-        <java-lib-version>${project.version}</java-lib-version>
-        <module-prefix>${java-package-name}</module-prefix>
-        <package-title>${project.name}</package-title>
+        <bin.module.java.package>org.exist.xquery.modules.expath.bin</bin.module.java.package>
+        <bin.module.java.classname>ExpathBinModule</bin.module.java.classname>
         <package-name>${bin.module.namespace}</package-name>
-        <package-abbrev>${project.artifactId}</package-abbrev>
-        <package-final-name>${project.artifactId}-${project.version}</package-final-name>
     </properties>
     
     <dependencies>
@@ -165,16 +154,10 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <!-- unfortunately this is needed by kuberam-expath-plugin to successfully
-                            generate its components.xml -->
-                            <mainClass>${java-package-name}.${java-package-main-class-name}</mainClass>
-                            <packageName>${java-package-name}</packageName>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                         <manifestEntries>
-                            <!-- unfortunately this is needed by kuberam-expath-plugin to successfully
-                            generate its components.xml -->
-                            <ModuleNamespace>${bin.module.namespace}</ModuleNamespace>
-
                             <Build-Tag>${build-tag}</Build-Tag>
                             <Git-Commit>${build-commit}</Git-Commit>
                             <Git-Commit-Abbrev>${build-commit-abbrev}</Git-Commit-Abbrev>
@@ -190,7 +173,6 @@
             <plugin>
                 <groupId>ro.kuberam.maven.plugins</groupId>
                 <artifactId>kuberam-expath-plugin</artifactId>
-                <version>0.5.0</version>
                 <executions>
                     <execution>
                         <id>create-xar</id>

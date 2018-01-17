@@ -21,4 +21,10 @@
             <version>${project.version}</version>
         </dependencySet>
     </dependencySets>
+    <components>
+        <resource>
+            <public-uri>${bin.module.namespace}</public-uri>
+            <file>${bin.module.java.package}.${bin.module.java.classname}</file>
+        </resource>
+    </components>
 </package>
