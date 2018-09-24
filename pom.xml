@@ -41,7 +41,7 @@
 
     <properties>
 	    <exist.version>4.0.0</exist.version>
-        <commons.lang.version>3.8</commons.lang.version>
+        <commons.lang.version>3.8.1</commons.lang.version>
         <bin.module.namespace>http://expath.org/ns/binary</bin.module.namespace>
         <bin.module.java.package>org.exist.xquery.modules.expath.bin</bin.module.java.package>
         <bin.module.java.classname>ExpathBinModule</bin.module.java.classname>
