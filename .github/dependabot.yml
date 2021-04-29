@@ -1,0 +1,15 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "03:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: com.mycila:license-maven-plugin
+    versions:
+    - "4.0"
+  - dependency-name: org.apache.commons:commons-lang3
+    versions:
+    - "3.11"
