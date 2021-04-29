@@ -40,7 +40,7 @@
     </scm>
 
     <properties>
-	    <exist.version>4.0.0</exist.version>
+	    <exist.version>4.7.0</exist.version>
         <commons.lang.version>3.10</commons.lang.version>
         <bin.module.namespace>http://expath.org/ns/binary</bin.module.namespace>
         <bin.module.java.package>org.exist.xquery.modules.expath.bin</bin.module.java.package>
